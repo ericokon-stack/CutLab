@@ -324,7 +324,7 @@ fn ring_poly(r: &[Pt]) -> Polygon<f64> {
 fn fill(o: &Obj) -> MultiPolygon<f64> {
     let mut acc = MultiPolygon::<f64>::new(vec![]);
     for r in o.placed() {
-        if closed(&r) { acc = acc.xor(&ring_poly(&r)); }
+        if closed(&r) { acc = acc.xor(&MultiPolygon::new(vec![ring_poly(&r)])); }
     }
     acc
 }
@@ -805,16 +805,16 @@ impl eframe::App for App {
             let gstep = if self.unit == Unit::In { 25.4 } else { 10.0 };
             if gstep * vs >= 6.0 {
                 let mut g = 0.0;
-                while g <= mw + 1e-6 { painter.line_segment([sp([g, 0.0]), sp([g, mh])], Stroke::new(1.0, c_grid)); g += gstep; }
+                while g <= mw + 1e-6 { painter.line_segment([sp([g, 0.0]), sp([g, mh])], Stroke::new(1.0_f32, c_grid)); g += gstep; }
                 g = 0.0;
-                while g <= mh + 1e-6 { painter.line_segment([sp([0.0, g]), sp([mw, g])], Stroke::new(1.0, c_grid)); g += gstep; }
+                while g <= mh + 1e-6 { painter.line_segment([sp([0.0, g]), sp([mw, g])], Stroke::new(1.0_f32, c_grid)); g += gstep; }
             }
             for o in &self.objs {
-                for p in o.placed() { painter.add(Shape::line(p.iter().map(|&q| sp(q)).collect(), Stroke::new(1.4, c_cut))); }
+                for p in o.placed() { painter.add(Shape::line(p.iter().map(|&q| sp(q)).collect(), Stroke::new(1.4_f32, c_cut))); }
             }
             if let Some(i) = self.sel {
                 let o = &self.objs[i];
-                painter.rect_stroke(Rect::from_two_pos(sp([o.x, o.y]), sp([o.x + o.w, o.y + o.h])), 0.0, Stroke::new(1.0, c_ac));
+                painter.rect_stroke(Rect::from_two_pos(sp([o.x, o.y]), sp([o.x + o.w, o.y + o.h])), 0.0, Stroke::new(1.0_f32, c_ac));
             }
 
             // rulers
@@ -827,7 +827,7 @@ impl eframe::App for App {
             let minor = ms.iter().copied().find(|s| s * su >= 7.0).unwrap_or(10.0);
             let label = ls.iter().copied().find(|&s| s * su >= 56.0 && s >= minor).unwrap_or(500.0);
             let is_m = |v: f64, q: f64| (v / q - (v / q).round()).abs() < 1e-6;
-            let tick = Stroke::new(1.0, c_fg);
+            let tick = Stroke::new(1.0_f32, c_fg);
             for axis in 0..2 {
                 let (o, len) = if axis == 0 { (vo.x as f64, rect.width() as f64) } else { (vo.y as f64, rect.height() as f64) };
                 let (a, b) = (((RULER as f64 + 2.0 - o) / su / minor).ceil() as i64, ((len - o) / su / minor).floor() as i64);
@@ -848,11 +848,11 @@ impl eframe::App for App {
                     }
                 }
             }
-            painter.line_segment([Pos2::new(rect.min.x, rect.min.y + RULER), Pos2::new(rect.max.x, rect.min.y + RULER)], Stroke::new(1.0, c_grid));
-            painter.line_segment([Pos2::new(rect.min.x + RULER, rect.min.y), Pos2::new(rect.min.x + RULER, rect.max.y)], Stroke::new(1.0, c_grid));
+            painter.line_segment([Pos2::new(rect.min.x, rect.min.y + RULER), Pos2::new(rect.max.x, rect.min.y + RULER)], Stroke::new(1.0_f32, c_grid));
+            painter.line_segment([Pos2::new(rect.min.x + RULER, rect.min.y), Pos2::new(rect.min.x + RULER, rect.max.y)], Stroke::new(1.0_f32, c_grid));
             if let Some(h) = resp.hover_pos() {
-                painter.line_segment([Pos2::new(h.x, rect.min.y), Pos2::new(h.x, rect.min.y + RULER)], Stroke::new(1.0, c_ac));
-                painter.line_segment([Pos2::new(rect.min.x, h.y), Pos2::new(rect.min.x + RULER, h.y)], Stroke::new(1.0, c_ac));
+                painter.line_segment([Pos2::new(h.x, rect.min.y), Pos2::new(h.x, rect.min.y + RULER)], Stroke::new(1.0_f32, c_ac));
+                painter.line_segment([Pos2::new(rect.min.x, h.y), Pos2::new(rect.min.x + RULER, h.y)], Stroke::new(1.0_f32, c_ac));
             }
             painter.text(rect.min + Vec2::new(3.0, 4.0), Align2::LEFT_TOP, if self.unit == Unit::In { "in" } else { "mm" }, FontId::proportional(9.0), c_fg);
         });
