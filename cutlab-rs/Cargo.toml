@@ -1,0 +1,19 @@
+[package]
+name = "cutlab"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+eframe = "0.29"
+rfd = "0.15"
+usvg = { version = "0.45", default-features = false }
+ttf-parser = "0.25"
+geo = "0.28"
+image = { version = "0.25", default-features = false, features = ["png", "jpeg", "bmp", "gif"] }
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { version = "0.59", features = ["Win32_Foundation", "Win32_Security", "Win32_Graphics_Gdi", "Win32_Graphics_Printing"] }
+
+[profile.release]
+opt-level = 3
+lto = true
